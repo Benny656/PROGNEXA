@@ -1,21 +1,20 @@
-# ── MaintenanceIQ Backend Configuration ──────────────────────────
-# Change any value here and it updates everywhere automatically
+# ── Prognexa Backend Configuration ───────────────────────────────
 
-# Machine definitions
 MACHINES = [
-    {"machine_id": 1,  "name": "Motor A",    "type": "Motor"},
-    {"machine_id": 2,  "name": "Conveyor B", "type": "Conveyor"},
-    {"machine_id": 3,  "name": "Pump C",     "type": "Pump"},
-    {"machine_id": 4,  "name": "Motor D",    "type": "Motor"},
-    {"machine_id": 5,  "name": "Conveyor E", "type": "Conveyor"},
-    {"machine_id": 6,  "name": "Pump F",     "type": "Pump"},
-    {"machine_id": 7,  "name": "Motor G",    "type": "Motor"},
-    {"machine_id": 8,  "name": "Conveyor H", "type": "Conveyor"},
-    {"machine_id": 9,  "name": "Pump I",     "type": "Pump"},
-    {"machine_id": 10, "name": "Motor J",    "type": "Motor"},
+    {"machine_id": 1,  "name": "Primary Drive Motor A",   "type": "Motor"},
+    {"machine_id": 2,  "name": "Conveyor Belt Line 1",    "type": "Conveyor"},
+    {"machine_id": 3,  "name": "Hydraulic Pump Station",  "type": "Pump"},
+    {"machine_id": 4,  "name": "Secondary Drive Motor B", "type": "Motor"},
+    {"machine_id": 5,  "name": "Conveyor Belt Line 2",    "type": "Conveyor"},
+    {"machine_id": 6,  "name": "Coolant Pump C",          "type": "Pump"},
+    {"machine_id": 7,  "name": "Assembly Motor D",        "type": "Motor"},
+    {"machine_id": 8,  "name": "Main Feed Conveyor",      "type": "Conveyor"},
+    {"machine_id": 9,  "name": "Booster Pump E",          "type": "Pump"},
+    {"machine_id": 10, "name": "Packaging Motor F",       "type": "Motor"},
+    {"machine_id": 11, "name": "Transfer Conveyor 3",     "type": "Conveyor"},
+    {"machine_id": 12, "name": "Recirculation Pump G",    "type": "Pump"},
 ]
 
-# Normal sensor ranges per machine type
 NORMAL_RANGES = {
     "Motor":    {"temperature": (60, 80),  "vibration": (1.0, 2.5),
                  "pressure":    (95, 105), "rpm":       (1400, 1600)},
@@ -25,7 +24,6 @@ NORMAL_RANGES = {
                  "pressure":    (100,120), "rpm":       (1100, 1300)},
 }
 
-# Sensor weights per machine type (must sum to 1.0)
 SENSOR_WEIGHTS = {
     "Motor":    {"temperature": 0.35, "vibration": 0.30,
                  "pressure":    0.20, "rpm":       0.15},
@@ -35,25 +33,20 @@ SENSOR_WEIGHTS = {
                  "pressure":    0.35, "rpm":       0.15},
 }
 
-# Risk level thresholds
 RISK_THRESHOLDS = {
     "low":    0.3,
     "medium": 0.6,
 }
 
-# Failure window prediction thresholds (in hours)
 FAILURE_WINDOWS = {
     "critical": 24,
     "warning":  48,
     "watch":    72,
 }
 
-# Workload redistribution
-MAX_LOAD_CAPACITY   = 100   # max load a machine can handle
-REDISTRIBUTION_TRIGGER = 0.6  # anomaly score that triggers redistribution
-MAX_LOAD_THRESHOLD  = 80    # machines above this % load won't receive work
+MAX_LOAD_CAPACITY      = 100
+REDISTRIBUTION_TRIGGER = 0.6
+MAX_LOAD_THRESHOLD     = 80
 
-
-# Flask config
 FLASK_PORT  = 5000
 FLASK_DEBUG = True

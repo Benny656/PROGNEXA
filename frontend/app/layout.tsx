@@ -7,9 +7,9 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'MaintenanceIQ - Predictive Maintenance Dashboard',
-  description: 'AI-powered predictive maintenance intelligence dashboard for industrial equipment monitoring',
-  generator: 'v0.app',
+  title: 'Prognexa - Predictive Maintenance Platform',
+  description: 'AI-powered predictive maintenance intelligence platform for industrial equipment monitoring',
+  generator: 'prognexa',
   icons: {
     icon: [
       {

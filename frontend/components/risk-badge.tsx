@@ -11,6 +11,7 @@ export function RiskBadge({ level, className }: { level: RiskLevel; className?: 
         level === "Low" && "bg-risk-low/15 text-risk-low",
         level === "Medium" && "bg-risk-medium/15 text-risk-medium",
         level === "High" && "bg-risk-high/15 text-risk-high",
+        level === "Offline" && "bg-muted text-muted-foreground",
         className
       )}
     >

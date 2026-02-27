@@ -2,21 +2,12 @@
 
 import { useEffect, useState, useMemo } from "react"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { RiskBadge } from "@/components/risk-badge"
 import { fetchMachines, fetchPrediction } from "@/lib/api"
@@ -35,9 +26,10 @@ export function AnomalyPanel({ onMachineSelect }: AnomalyPanelProps) {
 
   useEffect(() => {
     fetchMachines().then(async (data) => {
-      setMachines(data)
+      setMachines(data ?? [])
+      // Fetch predictions for all flagged + offline machines
       const flagged = data.filter(
-        (m) => m.riskLevel === "High" || m.riskLevel === "Medium"
+        (m) => m.riskLevel === "High" || m.riskLevel === "Medium" || m.riskLevel === "Offline"
       )
       const preds: Record<string, Prediction> = {}
       await Promise.all(
@@ -48,15 +40,19 @@ export function AnomalyPanel({ onMachineSelect }: AnomalyPanelProps) {
       )
       setPredictions(preds)
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }, [])
 
   const flaggedMachines = useMemo(() => {
     return machines
-      .filter((m) => m.riskLevel === "High" || m.riskLevel === "Medium")
+      .filter((m) => m.riskLevel === "High" || m.riskLevel === "Medium" || m.riskLevel === "Offline")
       .filter((m) => riskFilter === "all" || m.riskLevel === riskFilter)
       .filter((m) => typeFilter === "all" || m.type === typeFilter)
-      .sort((a, b) => b.anomalyScore - a.anomalyScore)
+      .sort((a, b) => {
+        // High first, then Offline, then Medium
+        const order: Record<string, number> = { High: 0, Offline: 1, Medium: 2, Low: 3 }
+        return (order[a.riskLevel] ?? 3) - (order[b.riskLevel] ?? 3)
+      })
   }, [machines, riskFilter, typeFilter])
 
   if (loading) {
@@ -71,14 +67,9 @@ export function AnomalyPanel({ onMachineSelect }: AnomalyPanelProps) {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold text-foreground">
-          Anomaly & Prediction Panel
-        </h2>
+        <h2 className="text-lg font-semibold text-foreground">Anomaly & Prediction Panel</h2>
         <div className="flex gap-3">
-          <Select
-            value={riskFilter}
-            onValueChange={(v) => setRiskFilter(v as RiskLevel | "all")}
-          >
+          <Select value={riskFilter} onValueChange={(v) => setRiskFilter(v as RiskLevel | "all")}>
             <SelectTrigger className="w-36 bg-secondary border-border text-foreground">
               <SelectValue placeholder="Risk Level" />
             </SelectTrigger>
@@ -86,12 +77,10 @@ export function AnomalyPanel({ onMachineSelect }: AnomalyPanelProps) {
               <SelectItem value="all">All Risk Levels</SelectItem>
               <SelectItem value="High">High</SelectItem>
               <SelectItem value="Medium">Medium</SelectItem>
+              <SelectItem value="Offline">Offline</SelectItem>
             </SelectContent>
           </Select>
-          <Select
-            value={typeFilter}
-            onValueChange={(v) => setTypeFilter(v as MachineType | "all")}
-          >
+          <Select value={typeFilter} onValueChange={(v) => setTypeFilter(v as MachineType | "all")}>
             <SelectTrigger className="w-32 bg-secondary border-border text-foreground">
               <SelectValue placeholder="Machine Type" />
             </SelectTrigger>
@@ -122,46 +111,37 @@ export function AnomalyPanel({ onMachineSelect }: AnomalyPanelProps) {
               <TableBody>
                 {flaggedMachines.map((machine) => {
                   const pred = predictions[machine.id]
-                  const topSensor = pred?.contributingSensors[0]?.name ?? "N/A"
+                  const topSensor = pred?.contributingSensors?.[0]?.name ?? "N/A"
+                  const isOffline = machine.riskLevel === "Offline"
                   return (
                     <TableRow
                       key={machine.id}
-                      className="cursor-pointer border-border hover:bg-secondary/50"
+                      className={`cursor-pointer border-border hover:bg-secondary/50 ${isOffline ? "opacity-60" : ""}`}
                       onClick={() => onMachineSelect(machine.id)}
                     >
-                      <TableCell className="font-mono text-sm text-foreground">
-                        {machine.id}
-                      </TableCell>
-                      <TableCell className="font-medium text-foreground">
-                        {machine.name}
-                      </TableCell>
+                      <TableCell className="font-mono text-sm text-foreground">{machine.id}</TableCell>
+                      <TableCell className="font-medium text-foreground">{machine.name}</TableCell>
                       <TableCell>
-                        <span
-                          className={`font-semibold ${
-                            machine.anomalyScore > 0.7
-                              ? "text-risk-high"
-                              : "text-risk-medium"
-                          }`}
-                        >
-                          {machine.anomalyScore.toFixed(2)}
+                        <span className={`font-semibold ${
+                          isOffline ? "text-muted-foreground" :
+                          machine.anomalyScore > 0.7 ? "text-risk-high" : "text-risk-medium"
+                        }`}>
+                          {isOffline ? "—" : machine.anomalyScore.toFixed(2)}
                         </span>
                       </TableCell>
-                      <TableCell>
-                        <RiskBadge level={machine.riskLevel} />
-                      </TableCell>
+                      <TableCell><RiskBadge level={machine.riskLevel} /></TableCell>
                       <TableCell className="text-foreground">
-                        {machine.predictedFailureWindow}
+                        {isOffline ? "Offline" : machine.predictedFailureWindow}
                       </TableCell>
-                      <TableCell className="text-muted-foreground">{topSensor}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {isOffline ? "—" : topSensor}
+                      </TableCell>
                     </TableRow>
                   )
                 })}
                 {flaggedMachines.length === 0 && (
                   <TableRow>
-                    <TableCell
-                      colSpan={6}
-                      className="py-8 text-center text-sm text-muted-foreground"
-                    >
+                    <TableCell colSpan={6} className="py-8 text-center text-sm text-muted-foreground">
                       No machines match the selected filters.
                     </TableCell>
                   </TableRow>
