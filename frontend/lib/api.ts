@@ -13,7 +13,7 @@ import type {
   RedistributionInfo,
 } from "./types"
 
-const API_BASE = "http://localhost:5000"
+const API_BASE = "https://brain-wave-hackathon-project-production.up.railway.app"
 
 async function fetchWithFallback<T>(url: string, fallback: T): Promise<T> {
   try {
