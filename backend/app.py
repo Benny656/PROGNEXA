@@ -11,6 +11,7 @@ from scoring import score_machine
 from predictor import predict_failure_window, get_trend_direction
 from redistributor import redistribute_workload, get_machine_load, reset_loads
 from feather_client import get_ai_recommendation, get_anomaly_score
+import os
 
 app = Flask(__name__)
 CORS(app)  # Allows frontend to call backend without issues
@@ -241,7 +242,8 @@ def health():
 
 # ── Run ───────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    app.run(
-        port=FLASK_PORT,
-        debug=FLASK_DEBUG
-    )
+app.run(
+    host="0.0.0.0",
+    port=int(os.environ.get("PORT", 5000)),
+    debug=False
+)
