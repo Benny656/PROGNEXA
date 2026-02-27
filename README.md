@@ -186,16 +186,6 @@ For Medium and High risk machines, `feather_client.py` sends a domain-specific p
 
 ---
 
-## Current Limitations
-
-- **No persistence**: Machine loads and shutdown states are in-memory. A server restart resets everything.
-- **Simulated data only**: All sensor readings are synthetic. A production deployment would need a real data ingestion layer (MQTT, REST hooks, or a database).
-- **No authentication**: The API has no auth layer — any user can call `/shutdown` or `/restore`.
-- **No auto-refresh**: The frontend does not poll the backend automatically; data reflects state at page load.
-- **Settings panel is UI-only**: Threshold changes, notification preferences, and API URL overrides do not persist or affect the backend.
-- **Static anomaly alert feed**: The real-time alerts panel on the dashboard uses hardcoded mock data and does not poll the backend for live events.
-- **Featherless.ai key not bundled**: AI recommendations silently fall back to a template string if the API key is missing.
-
 ---
 
 *PROGNEXA — Predictive Maintenance Intelligence Platform*
