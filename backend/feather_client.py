@@ -1,13 +1,13 @@
 # ── feather_client.py ─────────────────────────────────────────────
 # Uses Featherless.ai to generate smart AI maintenance recommendations
 # Falls back to local Isolation Forest for anomaly scoring
-
+import os
 import requests
 import numpy as np
 from sklearn.ensemble import IsolationForest
 
 # ── Paste your API key here ───────────────────────────────────────
-FEATHERLESS_API_KEY = "rc_51400760c149f720044a0d4acec125e76f6f839e6645d9524bc6da7b6ed447ae"
+FEATHERLESS_API_KEY = os.environ.get("FEATHERLESS_API_KEY")
 FEATHERLESS_URL     = "https://api.featherless.ai/v1/chat/completions"
 MODEL               = "deepseek-ai/DeepSeek-V3-0324"
 
