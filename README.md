@@ -2,6 +2,9 @@
 
 A full-stack predictive maintenance platform for manufacturing plants that detects anomalies, predicts failure windows, and redistributes workloads — with zero new hardware required.
 
+Project Link:
+https://prognexa.vercel.app/
+
 ## Tech Stack
 
 | Layer | Tech |
